@@ -200,7 +200,7 @@ def get_message():
     cur = dbh().cursor()
     #cur.execute("SELECT * FROM message WHERE id > %s AND channel_id = %s ORDER BY id DESC LIMIT 100",
     #            (last_message_id, channel_id))
-    cur.execute("SELECT essage.id, user.name, user.display_name, user.avatar_icon, message.created_at, message.content FROM message JOIN user ON message.user_id=user.id where message.id > %s AND channel_id = %s ORDER BY message.id DESC LIMIT 100",
+    cur.execute("SELECT message.id, user.name, user.display_name, user.avatar_icon, message.created_at, message.content FROM message JOIN user ON message.user_id=user.id where message.id > %s AND channel_id = %s ORDER BY message.id DESC LIMIT 100",
                 (last_message_id, channel_id))
     rows = cur.fetchall()
     response = []
