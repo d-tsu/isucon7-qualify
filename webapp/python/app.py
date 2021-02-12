@@ -198,19 +198,26 @@ def get_message():
     channel_id = int(flask.request.args.get('channel_id'))
     last_message_id = int(flask.request.args.get('last_message_id'))
     cur = dbh().cursor()
-    cur.execute("SELECT * FROM message WHERE id > %s AND channel_id = %s ORDER BY id DESC LIMIT 100",
+    #cur.execute("SELECT * FROM message WHERE id > %s AND channel_id = %s ORDER BY id DESC LIMIT 100",
+    #            (last_message_id, channel_id))
+    cur.execute("SELECT essage.id, user.name, user.display_name, user.avatar_icon, message.created_at, message.content FROM message JOIN user ON message.user_id=user.id where message.id > %s AND channel_id = %s ORDER BY message.id DESC LIMIT 100",
                 (last_message_id, channel_id))
     rows = cur.fetchall()
     response = []
     for row in rows:
         r = {}
         r['id'] = row['id']
-        cur.execute("SELECT name, display_name, avatar_icon FROM user WHERE id = %s", (row['user_id'],))
-        r['user'] = cur.fetchone()
+        #cur.execute("SELECT name, display_name, avatar_icon FROM user WHERE id = %s", (row['user_id'],))
+        user = {}
+        user['name'] = row['name']
+        user['display_name'] = row['display_name']
+        user['avatar_icon'] = row['avatar_icon']
+        r['user'] = user
         r['date'] = row['created_at'].strftime("%Y/%m/%d %H:%M:%S")
         r['content'] = row['content']
         response.append(r)
     response.reverse()
+
 
     max_message_id = max(r['id'] for r in rows) if rows else 0
     cur.execute('INSERT INTO haveread (user_id, channel_id, message_id, updated_at, created_at)'
